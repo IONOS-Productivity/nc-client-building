@@ -140,3 +140,4 @@ Rem Optional extra flags for the NSIS Installer build tool
 if "%NSIS_EXTRA_FLAGS%" == ""               set NSIS_EXTRA_FLAGS=
 
 Rem ************************************************************************************************************************************************************************************
+if "%CUSTOMIZATION_SERVICE%" == ""                      set CUSTOMIZATION_SERVICE=1
