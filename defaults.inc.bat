@@ -80,7 +80,7 @@ Rem Git pull defaults
 if "%PULL_DESKTOP%" == ""                   set PULL_DESKTOP=1
 
 Rem Git checkout defaults
-if "%CHECKOUT_DESKTOP%" == ""               set CHECKOUT_DESKTOP=1
+if "%CHECKOUT_DESKTOP%" == ""               set CHECKOUT_DESKTOP=0
 
 Rem Branding overrides
 if "%USE_BRANDING%" == "1" (
@@ -102,7 +102,7 @@ if "%INSTALLER_OUTPUT_PATH%" == ""          set INSTALLER_OUTPUT_PATH=%PROJECT_P
 
 Rem ************************************************************************************************************************************************************************************
 Rem Code Signing Options: 1 = enable (default), 0 = disable
-if "%USE_CODE_SIGNING%" == ""               set "USE_CODE_SIGNING=1"
+if "%USE_CODE_SIGNING%" == ""               set "USE_CODE_SIGNING=0"
 
 Rem Vendor Name: Used for signing, also used by the installer
 if "%APPLICATION_VENDOR%" == ""             set "APPLICATION_VENDOR=Nextcloud GmbH"
@@ -119,7 +119,7 @@ if "%SIGN_TIMESTAMP_DIGEST_ALG%" == ""      set "SIGN_TIMESTAMP_DIGEST_ALG=sha25
 
 Rem ************************************************************************************************************************************************************************************
 Rem Upload build: 1 = enable (default), 0 = disable
-if "%UPLOAD_BUILD%" == ""                   set UPLOAD_BUILD=1
+if "%UPLOAD_BUILD%" == ""                   set UPLOAD_BUILD=0
 
 Rem Delete build after successful upload: 1 = delete, 0 = keep (default)
 if "%UPLOAD_DELETE%" == ""                  set UPLOAD_DELETE=0
