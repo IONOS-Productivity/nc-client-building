@@ -29,7 +29,7 @@ Rem ****************************************************************************
 Rem Build environment
 
 rem Comma separated list of build targets (default: Win64, Win32)
-if "%BUILD_TARGETS%" == ""                  set BUILD_TARGETS=Win64,Win32
+if "%BUILD_TARGETS%" == ""                  set BUILD_TARGETS=Win64
 
 if "%PROJECT_PATH%" == ""                   set PROJECT_PATH=C:/repos/nc/nc-client-building
 
