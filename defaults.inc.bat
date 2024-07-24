@@ -20,10 +20,10 @@ Rem            If you intend to modify or specify them outside, keep the scheme!
 Rem ************************************************************************************************************************************************************************************
 Rem Branding options
 
-if "%APP_NAME%" == ""                       set APP_NAME=Nextcloud
-if "%APP_NAME_SANITIZED%" == ""             set APP_NAME_SANITIZED=Nextcloud
+if "%APP_NAME%" == ""                       set APP_NAME=IONOSEasystorage
+if "%APP_NAME_SANITIZED%" == ""             set APP_NAME_SANITIZED=IONOSEasystorage
 
-if "%USE_BRANDING%" == ""                   set USE_BRANDING=0
+if "%USE_BRANDING%" == ""                   set USE_BRANDING=1
 
 Rem ************************************************************************************************************************************************************************************
 Rem Build environment
