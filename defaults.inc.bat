@@ -20,8 +20,10 @@ Rem            If you intend to modify or specify them outside, keep the scheme!
 Rem ************************************************************************************************************************************************************************************
 Rem Branding options
 
-if "%APP_NAME%" == ""                       set APP_NAME=IONOSEasystorage
-if "%APP_NAME_SANITIZED%" == ""             set APP_NAME_SANITIZED=IONOSEasystorage
+@REM corresponds to APPLICATION_SHORTNAME from NEXTCLOUD.cmake
+if "%APP_NAME%" == ""                       set APP_NAME=Easystorage
+@REM corresponds to APPLICATION_EXECUTABLE from NEXTCLOUD.cmake
+if "%APP_NAME_EXE%" == ""             set APP_NAME_EXE=ionoseasystorage
 
 if "%USE_BRANDING%" == ""                   set USE_BRANDING=1
 

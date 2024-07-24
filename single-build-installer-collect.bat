@@ -19,7 +19,7 @@ set "MY_QT_DEPLOYMENT_PATH=%MY_INSTALL_PATH%/qt-libs"
 set "MY_COLLECT_PATH=%PROJECT_PATH%/collect/%BUILD_TYPE%/%BUILD_ARCH%"
 
 echo "* APP_NAME=%APP_NAME%"
-echo "* APP_NAME_SANITIZED=%APP_NAME_SANITIZED%"
+echo "* APP_NAME_EXE=%APP_NAME_EXE%"
 echo "* USE_BRANDING=%USE_BRANDING%"
 echo "* BUILD_TYPE=%BUILD_TYPE%"
 echo "* BUILD_ARCH=%BUILD_ARCH%"
@@ -47,7 +47,7 @@ rem 			"check for required environment variables"
 Rem ******************************************************************************************
 
 call :testEnv APP_NAME
-call :testEnv APP_NAME_SANITIZED
+call :testEnv APP_NAME_EXE
 call :testEnv PROJECT_PATH
 call :testEnv BUILD_TYPE
 call :testEnv BUILD_ARCH
@@ -107,8 +107,8 @@ echo "* copy desktop client files (bin/)."
 start "copy bin/" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_INSTALL_PATH%/bin/"* "%MY_COLLECT_PATH%/"
 if %ERRORLEVEL% neq 0 goto onError
 
-echo "* copy %APP_NAME_SANITIZED%_csync.dll."
-start "copy %APP_NAME_SANITIZED%_csync.dll" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_INSTALL_PATH%/bin/%APP_NAME_SANITIZED%_csync.dll" "%MY_COLLECT_PATH%/"
+echo "* copy %APP_NAME_EXE%_csync.dll."
+start "copy %APP_NAME_EXE%_csync.dll" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_INSTALL_PATH%/bin/%APP_NAME_EXE%_csync.dll" "%MY_COLLECT_PATH%/"
 if %ERRORLEVEL% neq 0 goto onError
 
 Rem exclude system file list
@@ -117,17 +117,17 @@ start "copy sync-exclude.lst" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_INSTA
 if %ERRORLEVEL% neq 0 goto onError
 
 Rem icon (hi-res version created by png2ico, if unavailable use lo-res: %MY_REPO%/admin/win/nsi/installer.ico)
-echo "* copy %APP_NAME_SANITIZED%.ico."
-if exist "%MY_BUILD_PATH%/src/gui/%APP_NAME_SANITIZED%.ico" (
-    start "copy %APP_NAME_SANITIZED%.ico" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_BUILD_PATH%/src/gui/%APP_NAME_SANITIZED%.ico" "%MY_COLLECT_PATH%/%APP_NAME_SANITIZED%.ico"
+echo "* copy %APP_NAME%.ico."
+if exist "%MY_BUILD_PATH%/src/gui/%APP_NAME%.ico" (
+    start "copy %APP_NAME%.ico" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_BUILD_PATH%/src/gui/%APP_NAME%.ico" "%MY_COLLECT_PATH%/%APP_NAME%.ico"
 ) else (
-    echo "  NOT FOUND - try to copy installer.ico to %APP_NAME_SANITIZED%.ico"
-    start "copy installer.ico to %APP_NAME_SANITIZED%.ico" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_REPO%/admin/win/nsi/installer.ico" "%MY_COLLECT_PATH%/%APP_NAME_SANITIZED%.ico"
+    echo "  NOT FOUND - try to copy installer.ico to %APP_NAME%.ico"
+    start "copy installer.ico to %APP_NAME%.ico" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_REPO%/admin/win/nsi/installer.ico" "%MY_COLLECT_PATH%/%APP_NAME%.ico"
 )
 if %ERRORLEVEL% neq 0 goto onError
 
-echo "* run windeployqt "%MY_COLLECT_PATH%/%APP_NAME_SANITIZED%.exe."
-start "run windeployqt" /D "%MY_COLLECT_PATH%/" /B /wait "%QT_BIN_PATH%/windeployqt.exe" --compiler-runtime --qmldir "%MY_REPO%\src" --angle --release --force --verbose 2 "%MY_COLLECT_PATH%/%APP_NAME_SANITIZED%.exe" "%MY_COLLECT_PATH%/%APP_NAME_SANITIZED%_csync.dll" "%MY_COLLECT_PATH%/%APP_NAME_SANITIZED%cmd.exe" "%MY_COLLECT_PATH%/%APP_NAME_SANITIZED%sync.dll"
+echo "* run windeployqt "%MY_COLLECT_PATH%/%APP_NAME_EXE%.exe."
+start "run windeployqt" /D "%MY_COLLECT_PATH%/" /B /wait "%QT_BIN_PATH%/windeployqt.exe" --compiler-runtime --qmldir "%MY_REPO%\src" --angle --release --force --verbose 2 "%MY_COLLECT_PATH%/%APP_NAME_EXE%.exe" "%MY_COLLECT_PATH%/%APP_NAME_EXE%_csync.dll" "%MY_COLLECT_PATH%/%APP_NAME_EXE%cmd.exe" "%MY_COLLECT_PATH%/%APP_NAME_EXE%sync.dll"
 if %ERRORLEVEL% neq 0 goto onError
 
 Rem Remove Qt bearer plugins, they seem to cause issues on Windows
@@ -246,10 +246,10 @@ if "%USE_CODE_SIGNING%" == "0" (
     for %%G in (
             "NCContextMenu.dll"
             "NCOverlays.dll"
-            "%APP_NAME_SANITIZED%.exe"
-            "%APP_NAME_SANITIZED%cmd.exe"
-            "%APP_NAME_SANITIZED%sync.dll"
-            "%APP_NAME_SANITIZED%_csync.dll"
+            "%APP_NAME_EXE%.exe"
+            "%APP_NAME_EXE%cmd.exe"
+            "%APP_NAME_EXE%sync.dll"
+            "%APP_NAME_EXE%_csync.dll"
             "qt5keychain%DLL_SUFFIX%.dll"
             "%LIBCRYPTO_DLL_FILENAME%"
             "%LIBSSL_DLL_FILENAME%"
