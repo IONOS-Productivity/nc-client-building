@@ -87,17 +87,22 @@ Rem ****************************************************************************
 rem 			"clean up"
 Rem ******************************************************************************************
 
-echo "* Remove old installation files %MY_INSTALL_PATH% from previous build."
-start "rm -rf" /B /wait rm -rf "%MY_INSTALL_PATH%/"*
-if %ERRORLEVEL% neq 0 goto onError
+if %SKIP_CLEANUP% == 1 (
+    echo "** SKIP_CLEANUP - exit."
+    
+) else (
+    echo "* Remove old installation files %MY_INSTALL_PATH% from previous build."
+    start "rm -rf" /B /wait rm -rf "%MY_INSTALL_PATH%/"*
+    if %ERRORLEVEL% neq 0 goto onError
 
-echo "* Remove old dependencies files %MY_QT_DEPLOYMENT_PATH% from previous build."
-start "rm -rf" /B /wait rm -rf "%MY_QT_DEPLOYMENT_PATH%/"*
-if %ERRORLEVEL% neq 0 goto onError
+    echo "* Remove old dependencies files %MY_QT_DEPLOYMENT_PATH% from previous build."
+    start "rm -rf" /B /wait rm -rf "%MY_QT_DEPLOYMENT_PATH%/"*
+    if %ERRORLEVEL% neq 0 goto onError
 
-echo "* Remove %MY_BUILD_PATH% from previous build."
-start "rm -rf" /B /wait rm -rf "%MY_BUILD_PATH%/"*
-if %ERRORLEVEL% neq 0 goto onError
+    echo "* Remove %MY_BUILD_PATH% from previous build."
+    start "rm -rf" /B /wait rm -rf "%MY_BUILD_PATH%/"*
+    if %ERRORLEVEL% neq 0 goto onError
+)
 
 Rem ******************************************************************************************
 rem 			"git pull, build, collect dependencies"
