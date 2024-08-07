@@ -55,31 +55,18 @@ Rem ****************************************************************************
 rem 			"check for required environment variables"
 Rem ******************************************************************************************
 
-echo "* Check for required environment variables. 1"
 call :testEnv APP_NAME
-echo "* Check for required environment variables. 2"
 call :testEnv PROJECT_PATH
-echo "* Check for required environment variables. 3"
 call :testEnv BUILD_TYPE
-echo "* Check for required environment variables. 4"
 call :testEnv BUILD_ARCH
-echo "* Check for required environment variables. 5"
 call :testEnv CMAKE_GENERATOR
-echo "* Check for required environment variables. 6"
 call :testEnv QT_PREFIX
-echo "* Check for required environment variables. 7"
 call :testEnv QT_PATH
-echo "* Check for required environment variables. 8"
 call :testEnv QT_BIN_PATH
-echo "* Check for required environment variables. 9"
 call :testEnv VCINSTALLDIR
-echo "* Check for required environment variables. 10"
 call :testEnv Png2Ico_EXECUTABLE
-echo "* Check for required environment variables. 11"
 call :testEnv BUILD_DATE
-echo "* Check for required environment variables. 12"
 call :testEnv BUILD_UPDATER
-echo "* Check for required environment variables. 13"
 call :testEnv TAG
 
 if %ERRORLEVEL% neq 0 goto onError
