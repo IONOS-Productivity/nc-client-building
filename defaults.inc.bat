@@ -45,7 +45,7 @@ if "%VCINSTALLDIR%" == "" (
 		set VCINSTALLDIR=C:\Program^ Files^ ^(x86^)\Microsoft^ Visual^ Studio\2017\Community\VC
 	)
 	if "%VS_VERSION%" == "2019"	(
-        set "VCINSTALLDIR=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC"
+        set "VCINSTALLDIR=C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC"
 	)
 )
 
