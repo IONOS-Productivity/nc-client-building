@@ -110,10 +110,10 @@ Rem Vendor Name: Used for signing, also used by the installer
 if "%APPLICATION_VENDOR%" == ""             set "APPLICATION_VENDOR=Nextcloud GmbH"
 
 Rem PFX Key and Password - it may be a good idea to set the password outside (environment variables)
-if "%CERTIFICATE_FILENAME%" == ""           set "CERTIFICATE_FILENAME="
+if "%CERTIFICATE_FILENAME%" == ""           set "CERTIFICATE_FILENAME=%~2"
 if "%CERTIFICATE_CSP%" == ""                set "CERTIFICATE_CSP="
 if "%CERTIFICATE_KEY_CONTAINER_NAME%" == "" set "CERTIFICATE_KEY_CONTAINER_NAME="
-if "%CERTIFICATE_PASSWORD%" == ""           set "CERTIFICATE_PASSWORD="
+if "%CERTIFICATE_PASSWORD%" == ""           set "CERTIFICATE_PASSWORD=%~3"
 
 if "%SIGN_FILE_DIGEST_ALG%" == ""           set "SIGN_FILE_DIGEST_ALG=sha256"
 if "%SIGN_TIMESTAMP_URL%" == ""             set "SIGN_TIMESTAMP_URL=http://timestamp.digicert.com"
