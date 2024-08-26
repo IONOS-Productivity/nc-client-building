@@ -43,8 +43,8 @@ if "%USE_CODE_SIGNING%" == "0" (
 call :testEnv PROJECT_PATH
 call :testEnv APPLICATION_VENDOR
 call :testEnv CERTIFICATE_FILENAME
-call :testEnv CERTIFICATE_CSP
-call :testEnv CERTIFICATE_KEY_CONTAINER_NAME
+@REM call :testEnv CERTIFICATE_CSP
+@REM call :testEnv CERTIFICATE_KEY_CONTAINER_NAME
 call :testEnv CERTIFICATE_PASSWORD
 call :testEnv SIGN_FILE_DIGEST_ALG
 call :testEnv SIGN_TIMESTAMP_URL
@@ -88,7 +88,7 @@ rem Reference: https://ss64.com/nt/setlocal.html
 rem Reference: https://ss64.com/nt/start.html
 
 echo "* Run signtool on file: %~1"
-start "signtool" /D "%PROJECT_PATH%" /B /wait "%SIGNTOOL%" sign /debug /v /tr "%SIGN_TIMESTAMP_URL%" /td %SIGN_TIMESTAMP_DIGEST_ALG% /fd %SIGN_FILE_DIGEST_ALG% /f "%CERTIFICATE_FILENAME%" /csp "%CERTIFICATE_CSP%" /kc "[{{%CERTIFICATE_PASSWORD%}}]=%CERTIFICATE_KEY_CONTAINER_NAME%" "%~1"
+start "signtool" /D "%PROJECT_PATH%" /B /wait "%SIGNTOOL%" sign /debug /v /tr "%SIGN_TIMESTAMP_URL%" /td %SIGN_TIMESTAMP_DIGEST_ALG% /fd %SIGN_FILE_DIGEST_ALG% /f "%CERTIFICATE_FILENAME%" /p "%CERTIFICATE_PASSWORD%" /d "%APP_FULL_NAME%" "%~1"
 if %ERRORLEVEL% neq 0 goto onError
 
 Rem ******************************************************************************************
