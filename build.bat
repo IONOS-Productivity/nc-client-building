@@ -31,6 +31,11 @@ call :testEnv VS_VERSION
 call :testEnv VCINSTALLDIR
 call :testEnv WIN_GIT_PATH
 
+if "%USE_CODE_SIGNING%" == "1" (
+    call :testEnv CERTIFICATE_PASSWORD
+    call :testEnv CERTIFICATE_FILENAME
+)
+
 if %ERRORLEVEL% neq 0 goto onError
 
 Rem ******************************************************************************************
