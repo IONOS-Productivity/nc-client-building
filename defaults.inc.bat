@@ -3,9 +3,10 @@ rem 			"Build defaults - environment Variables"
 Rem ************************************************************************************************************************************************************************************
 
 rem Release or Debug
-set BUILD_TYPE=Release
 
 if "%~1" == "Debug" (set BUILD_TYPE=%~1)
+if "%~1" == "Release" (set BUILD_TYPE=%~1)
+
 
 Rem ************************************************************************************************************************************************************************************
 rem 			"CUSTOMIZE HERE:"
@@ -47,7 +48,7 @@ if "%VCINSTALLDIR%" == "" (
 		set VCINSTALLDIR=C:\Program^ Files^ ^(x86^)\Microsoft^ Visual^ Studio\2017\Community\VC
 	)
 	if "%VS_VERSION%" == "2019"	(
-        set "VCINSTALLDIR=C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC"
+        set "VCINSTALLDIR=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC"
 	)
 )
 
@@ -106,7 +107,7 @@ if "%INSTALLER_OUTPUT_PATH%" == ""          set INSTALLER_OUTPUT_PATH=%PROJECT_P
 
 Rem ************************************************************************************************************************************************************************************
 Rem Code Signing Options: 1 = enable (default), 0 = disable
-if "%USE_CODE_SIGNING%" == ""               set "USE_CODE_SIGNING=0"
+if "%USE_CODE_SIGNING%" == ""               set "USE_CODE_SIGNING=1"
 
 Rem Vendor Name: Used for signing, also used by the installer
 if "%APPLICATION_VENDOR%" == ""             set "APPLICATION_VENDOR=Nextcloud GmbH"
