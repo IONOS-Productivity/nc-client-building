@@ -22,11 +22,11 @@ Rem ****************************************************************************
 Rem Branding options
 
 @REM corresponds to APPLICATION_SHORTNAME from NEXTCLOUD.cmake
-if "%APP_NAME%" == ""                       set APP_NAME=Easystorage
+if "%APP_NAME%" == ""                       set APP_NAME=HiDriveNext
 @REM corresponds to APPLICATION_EXECUTABLE from NEXTCLOUD.cmake
-if "%APP_NAME_EXE%" == ""             set APP_NAME_EXE=ionoseasystorage
+if "%APP_NAME_EXE%" == ""             set APP_NAME_EXE=hidrivenext
 @REM corresponds to APPLICATION_NAME from NEXTCLOUD.cmake
-if "%APP_FULL_NAME%" == ""             set APP_FULL_NAME=IONOS EasyStorage
+if "%APP_FULL_NAME%" == ""             set APP_FULL_NAME=HiDrvie Next
 
 if "%USE_BRANDING%" == ""                   set USE_BRANDING=1
 
