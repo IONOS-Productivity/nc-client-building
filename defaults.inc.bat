@@ -26,7 +26,7 @@ if "%APP_NAME%" == ""                       set APP_NAME=HiDriveNext
 @REM corresponds to APPLICATION_EXECUTABLE from NEXTCLOUD.cmake
 if "%APP_NAME_EXE%" == ""             set APP_NAME_EXE=hidrivenext
 @REM corresponds to APPLICATION_NAME from NEXTCLOUD.cmake
-if "%APP_FULL_NAME%" == ""             set APP_FULL_NAME=HiDrvie Next
+if "%APP_FULL_NAME%" == ""             set APP_FULL_NAME=HiDrive Next
 
 if "%USE_BRANDING%" == ""                   set USE_BRANDING=1
 
