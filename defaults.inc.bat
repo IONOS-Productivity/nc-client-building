@@ -110,7 +110,7 @@ Rem Code Signing Options: 1 = enable (default), 0 = disable
 if "%USE_CODE_SIGNING%" == ""               set "USE_CODE_SIGNING=1"
 
 Rem Vendor Name: Used for signing, also used by the installer
-if "%APPLICATION_VENDOR%" == ""             set "APPLICATION_VENDOR=Nextcloud GmbH"
+@REM if "%APPLICATION_VENDOR%" == ""             set "APPLICATION_VENDOR=Nextcloud GmbH"
 
 Rem PFX Key and Password - it may be a good idea to set the password outside (environment variables)
 if "%CERTIFICATE_FILENAME%" == ""           set "CERTIFICATE_FILENAME=%~2"

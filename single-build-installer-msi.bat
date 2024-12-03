@@ -55,7 +55,7 @@ call :testEnv BUILD_DATE
 
 if "%USE_CODE_SIGNING%" == "1" (
     call :testEnv VCINSTALLDIR
-    call :testEnv APPLICATION_VENDOR
+    @REM call :testEnv APPLICATION_VENDOR
     call :testEnv CERTIFICATE_FILENAME
     @REM call :testEnv CERTIFICATE_CSP
     @REM call :testEnv CERTIFICATE_KEY_CONTAINER_NAME
