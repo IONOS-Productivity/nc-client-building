@@ -94,7 +94,7 @@ if "%USE_BRANDING%" == "1" (
 )
 
 Rem Updater: ON = build, OFF = don't build (default)
-if "%BUILD_UPDATER%" == ""                  set BUILD_UPDATER=OFF
+if "%BUILD_UPDATER%" == ""                  set BUILD_UPDATER=ON
 
 Rem ************************************************************************************************************************************************************************************
 Rem Installer Options: 1 = build, 0 = don't build (default)
