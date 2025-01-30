@@ -72,7 +72,7 @@ if "%BUILD_DATE%" == "" (
     )
 )
 
-if "%VERSION_SUFFIX%" == ""                 set VERSION_SUFFIX=increment
+if "%VERSION_SUFFIX%" == ""                 set VERSION_SUFFIX=stable
 
 Rem Git tags for checkout
 Rem Desktop Client (master for daily build or e.g.: stable-2.5.3)
