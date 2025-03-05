@@ -19,7 +19,7 @@ set "MY_INSTALL_PATH=%PROJECT_PATH%/install/%BUILD_TYPE%/%BUILD_ARCH%"
 set "MY_QT_DEPLOYMENT_PATH=%MY_INSTALL_PATH%/qt-libs"
 set "MY_COLLECT_PATH=%PROJECT_PATH%/collect/%BUILD_TYPE%/%BUILD_ARCH%"
 
-echo "* APP_NAME=%APP_NAME%"
+echo "* APP_NAME_EXE=%APP_NAME_EXE%"
 echo "* APP_NAME_EXE=%APP_NAME_EXE%"
 echo "* USE_BRANDING=%USE_BRANDING%"
 echo "* BUILD_TYPE=%BUILD_TYPE%"
@@ -47,7 +47,7 @@ Rem ****************************************************************************
 rem 			"check for required environment variables"
 Rem ******************************************************************************************
 
-call :testEnv APP_NAME
+call :testEnv APP_NAME_EXE
 call :testEnv APP_NAME_EXE
 call :testEnv PROJECT_PATH
 call :testEnv BUILD_TYPE
@@ -118,12 +118,12 @@ start "copy sync-exclude.lst" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_INSTA
 if %ERRORLEVEL% neq 0 goto onError
 
 Rem icon (hi-res version created by png2ico, if unavailable use lo-res: %MY_REPO%/admin/win/nsi/installer.ico)
-echo "* copy %APP_NAME%.ico."
-if exist "%MY_BUILD_PATH%/src/gui/%APP_NAME%.ico" (
-    start "copy %APP_NAME%.ico" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_BUILD_PATH%/src/gui/%APP_NAME%.ico" "%MY_COLLECT_PATH%/%APP_NAME%.ico"
+echo "* copy %APP_NAME_EXE%.ico."
+if exist "%MY_BUILD_PATH%/src/gui/%APP_NAME_EXE%.ico" (
+    start "copy %APP_NAME_EXE%.ico" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_BUILD_PATH%/src/gui/%APP_NAME_EXE%.ico" "%MY_COLLECT_PATH%/%APP_NAME_EXE%.ico"
 ) else (
-    echo "  NOT FOUND - try to copy installer.ico to %APP_NAME%.ico"
-    start "copy installer.ico to %APP_NAME%.ico" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_REPO%/admin/win/nsi/installer.ico" "%MY_COLLECT_PATH%/%APP_NAME%.ico"
+    echo "  NOT FOUND - try to copy installer.ico to %APP_NAME_EXE%.ico"
+    start "copy installer.ico to %APP_NAME_EXE%.ico" /D "%MY_COLLECT_PATH%/" /B /wait cp -af "%MY_REPO%/admin/win/nsi/installer.ico" "%MY_COLLECT_PATH%/%APP_NAME_EXE%.ico"
 )
 if %ERRORLEVEL% neq 0 goto onError
 
