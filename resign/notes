@@ -1,0 +1,19 @@
+& "C:\Program Files (x86)\WiX Toolset v3.14\bin\heat.exe" dir "C:\Daten\Resign\Extracted\PFiles\IONOS HiDrive Next" -dr INSTALLDIR -sreg -srd -sfrag -ag -cg "ClientFiles" -var "var.HarvestAppDir" -platform="x64" -t "C:\repos\nc\nc-desktop\admin\win\msi\collect-transform.xsl" -out "C:\Daten\Resign\Extracted\PFiles\collect.wxs"
+
+
+
+
+& "C:\Program Files (x86)\WiX Toolset v3.14\bin\candle.exe" -dcodepage=1252 -dPlatform="x64" -arch "x64" -dHarvestAppDir="C:\Daten\Resign\Extracted\PFiles\IONOS HiDrive Next" -ext WixUtilExtension "C:\repos\nc\nc-desktop\admin\win\tools\NCMsiHelper\NCMsiHelper.wxs" "C:\Daten\Resign\Extracted\PFiles\WinShellExt.wxs" "C:\Daten\Resign\Extracted\PFiles\collect.wxs" "C:\repos\nc\nc-desktop\admin\win\msi\Ionos.wxs" "C:\repos\nc\nc-desktop\admin\win\msi\RegistryCleanupCustomAction.wxs"
+
+
+& "C:\Program Files (x86)\WiX Toolset v3.14\bin\light.exe" -sw1076 -ext WixUIExtension -ext WixUtilExtension -cultures:en-us "C:\Daten\Resign\Extracted\PFiles\NCMsiHelper.wixobj" "C:\Daten\Resign\Extracted\PFiles\WinShellExt.wixobj" "C:\Daten\Resign\Extracted\PFiles\collect.wixobj" "C:\Daten\Resign\Extracted\PFiles\Ionos.wixobj" "C:\Daten\Resign\Extracted\PFiles\RegistryCleanupCustomAction.wixobj" -out "C:\Daten\Resign\Extracted\PFiles\installer.msi"
+
+
+
+
+
+    <Property Id="INSTALLDIR">
+        <RegistrySearch Id="RegistryInstallDir" Type="raw" Root="HKLM" Key="Software\$(var.AppVendor)\$(var.AppName)" Win64="no" />
+    </Property>
+
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
