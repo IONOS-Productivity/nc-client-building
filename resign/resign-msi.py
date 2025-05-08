@@ -4,6 +4,70 @@ import os
 from pathlib import Path
 import sys
 
+import xml.etree.ElementTree as ET
+import fnmatch
+
+def match_filename(name, pattern, wildcard):
+    if wildcard:
+        if name and fnmatch.fnmatch(name.lower(), pattern):
+            return True
+    else:
+        if name and name.lower() == pattern.lower():
+            return True
+    return False
+
+def read_wxs(wxs_file, filename, wildcard=False, first=True):
+    try:
+        tree = ET.parse(wxs_file)
+        root = tree.getroot()
+    except Exception as e:
+        print(f"Error reading WXS file: {e}", file=sys.stderr)
+        return 2
+
+    ns = {'wix': 'http://schemas.microsoft.com/wix/2006/wi'}
+    ET.register_namespace('', ns['wix'])
+
+    matches = []
+    for file_elem in root.findall(".//wix:File", ns):
+        name = file_elem.attrib.get("Name")
+        if match_filename(name, filename, wildcard):
+            source = file_elem.attrib.get("Source")
+            if source:
+                matches.append(source)
+
+    if matches:
+        if first:
+            return matches[0]
+        else:
+            return matches
+    else:
+        return None
+    
+def read_wildcard_name(wxs_file, filename, first=True):
+    try:
+        tree = ET.parse(wxs_file)
+        root = tree.getroot()
+    except Exception as e:
+        print(f"Error reading WXS file: {e}", file=sys.stderr)
+        return 2
+
+    ns = {'wix': 'http://schemas.microsoft.com/wix/2006/wi'}
+    ET.register_namespace('', ns['wix'])
+
+    matches = []
+    for file_elem in root.findall(".//wix:File", ns):
+        name = file_elem.attrib.get("Name")
+        if match_filename(name, filename, True):
+            matches.append(name)
+
+    if matches:
+        if first:
+            return matches[0]
+        else:
+            return matches
+    else:
+        return None
+
 def rename_file(src, dst):
     """
     Rename a file from src to dst.
@@ -49,7 +113,6 @@ def sign_file(file_path, sign_tool, cert_file, cert_password, app_name):
         "--app-name", app_name
     ], capture_output=True, text=True)
     
-    
     if sign_result.returncode == 0:
         print(f"[OK] ({__file__}) Successfully signed {file_path.name}")
     else:
@@ -94,6 +157,8 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+# TODO check if fullpath or only filename, combine base-dir if filename
+
 start_msi = Path(args.input_msi)
 sign_tool = Path(args.sign_tool)
 app_name = str(args.app_name)
@@ -133,35 +198,34 @@ run_command([
 #--- Signing ----------------
 #----------------------------   
 print(f"🔧 Start signing extracted files...")
-file_names = [
+exact_file_names = [
     "NCContextMenu.dll",
     "NCOverlays.dll",
     app_name_sanitized + ".exe",
     app_name_sanitized + "cmd.exe",
     app_name_sanitized + "sync.dll",
     app_name_sanitized + "_csync.dll",
-    # "qt6keychain%DLL_SUFFIX%.dll",
-    # "%LIBCRYPTO_DLL_FILENAME%",
-    # "%LIBSSL_DLL_FILENAME%",
-    # "zlib1%DLL_SUFFIX%.dll",
 ]
 
-for file_name in file_names:
+fuzzy_file_names = [
+    "qt6keychain*.dll",
+    "libcrypto-3*.dll", 
+    "libssl-3*.dll", 
+    "zlib1*.dll", 
+]
+
+for file_name in exact_file_names:
     
     print(f"\t🔍 Looking for: {file_name}")
-    search_result = subprocess.run(
-        ["python", "read_wsx.py", wxs_file, file_name, "--first"],
-        capture_output=True,
-        text=True
-    )
 
-    if search_result.returncode == 0:
-        source_path = Path(search_result.stdout.strip())
-        print(f"\t🎯 Found: {source_path}")
-    elif search_result.returncode == 1:
+    search_result = read_wxs(wxs_file, file_name, first=True)
+
+    if search_result is None:
         print("\t❌ No match found.")
+        continue        
     else:
-        print(f"\t💥 Error:\n{search_result.stderr.strip()}")
+        source_path = Path(search_result)
+        print(f"\t🎯 Found: {source_path}, {file_name}")  
         
     renamed_file_path = source_path.parent / file_name    
     rename_file(source_path, renamed_file_path)
@@ -170,6 +234,31 @@ for file_name in file_names:
     
     rename_file(renamed_file_path, source_path)
     
+for file_name in fuzzy_file_names:
+    
+    print(f"\t🔍 Looking for: {file_name}")
+    search_result = read_wxs(wxs_file, file_name, first=True, wildcard=True)
+    
+    if search_result is None:
+        print("\t❌ No match found.")
+        continue
+    else:
+        source_path = Path(search_result)
+        name = read_wildcard_name(wxs_file, file_name, True)
+        if name is not None:
+            print(f"\t🎯 Found: {source_path}, {name}")  
+        else:
+            print(f"\t❌ No match found.")
+            continue
+            
+
+    renamed_file_path = source_path.parent / name    
+    rename_file(source_path, renamed_file_path)
+
+    sign_file(renamed_file_path, sign_tool, args.cert_file, args.cert_password, app_name)
+    
+    rename_file(renamed_file_path, source_path)
+
 #----------------------------   
 #--- Recompiling-------------
 #----------------------------  
@@ -204,8 +293,7 @@ run_command(
     ]
     , "Compiling WXS to WIXOBJ", args.v)
 
-# Step 2: Link .wixobj to .msi usi
-# ng light.exe
+# Step 2: Link .wixobj to .msi using light.exe
 light = Path(wix_path) / "bin" / "light.exe"
 
 run_command([
@@ -215,6 +303,7 @@ run_command([
     "-o", str(msi_file)
 ], "Linking WIXOBJ to MSI", args.v)
 
+# Signing the new .msi file
 print(f"🔧 Start signing new .msi file...")
 
 sign_file(

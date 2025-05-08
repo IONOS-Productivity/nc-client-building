@@ -47,6 +47,10 @@ def repair_ui(wxs_path: Path, extracted_path: Path, in_place: bool):
         print("[ERR] No <Product> element found.")
         return
 
+    # ---------------------------------------
+    # --- Fixing Banner and Dialog images ---
+    # ---------------------------------------
+
     # Create <WixVariable Id="WixUIBannerBmp" Value="WixUI_Bmp_Banner" />
     extracted_path = Path(extracted_path) / "Binary"
     banner_path = extracted_path / "WixUI_Bmp_Banner"
@@ -74,6 +78,11 @@ def repair_ui(wxs_path: Path, extracted_path: Path, in_place: bool):
         print("ℹ️ <UI> not found — creating new <UI> section.")
         ui = ET.SubElement(product, f"{{{ns['wix']}}}UI")
 
+
+    # ---------------------------------------
+    # --- Hiding the License Page -----------
+    # ---------------------------------------
+    
     # Define the elements to add
     ui_items = []
     ui_items.append(Element("UIRef", {"Id": "WixUI_FeatureTree"}))

@@ -5,6 +5,45 @@ import sys
 from pathlib import Path
 
 
+def sign(file, signtool, timestamp_url, timestamp_alg
+         , file_digest_alg, cert_file, cert_password, app_name):
+    args = parser.parse_args()
+
+    sign_file = Path(file)
+
+    # Build the signtool command
+    cmd = [
+        signtool,
+        "sign",
+        # "/debug",
+        # "/v",
+        "/tr", timestamp_url,
+        "/td", timestamp_alg,
+        "/fd", file_digest_alg,
+        "/f", cert_file,
+        "/p", cert_password,
+        "/d", app_name,
+        sign_file
+    ]
+
+    # Execute the command
+    result = subprocess.run(
+        cmd,
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode != 0:
+        print(f"[ERR] ({__file__}) Signing failed for {sign_file.name}")
+        print(f"[ERR] ({__file__}) STDOUT:\n" + result.stdout.strip())
+        print(f"[ERR] ({__file__}) STDERR:\n" + result.stderr.strip())
+        return result.returncode
+    else:
+        print(f"[OK] ({__file__}) Successfully signed {sign_file.name}")
+        return 0 # Explicit success
+    
+    
+    
 # CLI argument setup
 parser = argparse.ArgumentParser(description="Signs a single file using sign.py.")
 parser.add_argument("file_path", help="Path to the file to sign")
@@ -21,25 +60,17 @@ args = parser.parse_args()
 
 # Loop over files and call sign.py
 print(f"Signing: {args.file_path}")
-result = subprocess.run([
-    sys.executable,  # ensures we're calling with the current Python interpreter
-    "./sign.py",
-    str(args.file_path),
-    "--signtool", args.signtool,
-    "--timestamp-url", timestamp_url,
-    "--timestamp-alg", timestamp_alg,
-    "--file-digest-alg", file_digest_alg,
-    "--cert-file", args.cert_file,
-    "--cert-password", args.cert_password,
-    "--app-name", args.app_name
-])
+
+result = sign(args.file_path, args.signtool, timestamp_url, timestamp_alg
+         , file_digest_alg, args.cert_file, args.cert_password, args.app_name)
+
 path = Path(args.file_path)
 
-if result.returncode != 0:
+if result != 0:
     print(f"[ERR] ({__file__}) Signing failed for {path.name}")
     print(f"[ERR] ({__file__}) STDOUT:\n" + result.stdout.strip())
     print(f"[ERR] ({__file__}) STDERR:\n" + result.stderr.strip())
-    sys.exit(result.returncode)  # Propagate the failure
+    sys.exit(result)  # Propagate the failure
 else:
     print(f"[OK] ({__file__}) Successfully signed {path.name}")
     sys.exit(0)  # Explicit success
