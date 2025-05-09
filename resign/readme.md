@@ -168,7 +168,3 @@ Adds:
 The modified `.wxs` file is saved in-place. It is now fully compatible with `candle.exe` and `light.exe`, making it possible to **rebuild and resign** the MSI correctly.
 
 ---
-
-Let me know if you'd like a single combined `README.md` that includes both `resign-msi.py` and `fix-wxs.py`.
-
-
