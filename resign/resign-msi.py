@@ -7,6 +7,15 @@ import sys
 import xml.etree.ElementTree as ET
 import fnmatch
 
+def check_and_resolve_path(path):
+    try:
+        print(f"🔍 Checking path: {path.resolve(strict=False)}")
+        resolved_path = path.resolve(strict=True)
+        return resolved_path
+    except FileNotFoundError:
+        print(f"❌ File not found: {path}")
+        return None
+
 def match_filename(name, pattern, wildcard):
     if wildcard:
         if name and fnmatch.fnmatch(name.lower(), pattern):
@@ -119,6 +128,7 @@ def sign_file(file_path, sign_tool, cert_file, cert_password, app_name):
         print(f"[ERR] ({__file__}) Signing failed for {file_path.name}")
         print(f"[ERR] ({__file__}) STDOUT:\n" + sign_result.stdout.strip())
         print(f"[ERR] ({__file__}) STDERR:\n" + sign_result.stderr.strip())
+    return sign_result.returncode
 
 #----------------------------   
 #--- Begin ------------------
@@ -164,6 +174,22 @@ sign_tool = Path(args.sign_tool)
 app_name = str(args.app_name)
 app_name_sanitized = app_name.replace(" ", "_")
 base_dir = Path(args.base_dir)
+cert_file = Path(args.cert_file)
+
+# Check and resolve all paths
+start_msi = check_and_resolve_path(start_msi)
+if start_msi is None:
+    sys.exit(1)
+sign_tool = check_and_resolve_path(sign_tool)
+if sign_tool is None:
+    sys.exit(1)
+cert_file = check_and_resolve_path(cert_file)
+if cert_file is None:
+    sys.exit(1)
+base_dir = check_and_resolve_path(base_dir)
+if base_dir is None:
+    sys.exit(1)
+
 
 wxs_name = "temp"
 wxs_file = base_dir / (wxs_name +".wxs")
@@ -182,11 +208,15 @@ else:
         print(f"🔧 WIX path is: {wix_path}")
     else:
         print("❌ WIX environment variable not set.")
+wix_path = Path(wix_path)
+wix_path = check_and_resolve_path(wix_path)
+if wix_path is None:
+    sys.exit(1)
 
 #----------------------------   
 #--- Decompiling-------------
 #----------------------------   
-dark = Path(wix_path) / "bin" / "dark.exe"
+dark = wix_path / "bin" / "dark.exe"
 
 run_command([
     str(dark), str(start_msi),
@@ -230,7 +260,9 @@ for file_name in exact_file_names:
     renamed_file_path = source_path.parent / file_name    
     rename_file(source_path, renamed_file_path)
 
-    sign_file(renamed_file_path, sign_tool, args.cert_file, args.cert_password, app_name)
+    sign_res = sign_file(renamed_file_path, sign_tool, str(cert_file), args.cert_password, app_name)
+    if sign_res != 0:
+        sys.exit(sign_res)
     
     rename_file(renamed_file_path, source_path)
     
@@ -255,8 +287,9 @@ for file_name in fuzzy_file_names:
     renamed_file_path = source_path.parent / name    
     rename_file(source_path, renamed_file_path)
 
-    sign_file(renamed_file_path, sign_tool, args.cert_file, args.cert_password, app_name)
-    
+    sign_res = sign_file(renamed_file_path, sign_tool, str(cert_file), args.cert_password, app_name)
+    if sign_res != 0:
+        sys.exit(sign_res)
     rename_file(renamed_file_path, source_path)
 
 #----------------------------   
@@ -281,7 +314,7 @@ else:
     print(f"[ERR] ({__file__}) STDERR:\n" + fix_result.stderr.strip())
     sys.exit(fix_result.returncode)
 
-candle = Path(wix_path) / "bin" / "candle.exe"
+candle = wix_path / "bin" / "candle.exe"
 
 # Step 1: Compile .wxs to .wixobj using candle.exe
 run_command(
@@ -294,7 +327,7 @@ run_command(
     , "Compiling WXS to WIXOBJ", args.v)
 
 # Step 2: Link .wixobj to .msi using light.exe
-light = Path(wix_path) / "bin" / "light.exe"
+light = wix_path / "bin" / "light.exe"
 
 run_command([
     str(light), str(wixobj_file),
@@ -306,13 +339,16 @@ run_command([
 # Signing the new .msi file
 print(f"🔧 Start signing new .msi file...")
 
-sign_file(
+sign_res = sign_file(
     msi_file,
     sign_tool,
-    args.cert_file,
+    str(cert_file),
     args.cert_password,
     app_name
 )
+
+if sign_res != 0:
+    sys.exit(sign_res)
 
 print(f"\n🎉 Installer built successfully: {msi_file}")
 sys.exit(0)  # Explicit success

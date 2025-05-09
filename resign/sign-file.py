@@ -37,10 +37,10 @@ def sign(file, signtool, timestamp_url, timestamp_alg
         print(f"[ERR] ({__file__}) Signing failed for {sign_file.name}")
         print(f"[ERR] ({__file__}) STDOUT:\n" + result.stdout.strip())
         print(f"[ERR] ({__file__}) STDERR:\n" + result.stderr.strip())
-        return result.returncode
+        return result
     else:
         print(f"[OK] ({__file__}) Successfully signed {sign_file.name}")
-        return 0 # Explicit success
+        return result # Explicit success
     
     
     
@@ -66,11 +66,11 @@ result = sign(args.file_path, args.signtool, timestamp_url, timestamp_alg
 
 path = Path(args.file_path)
 
-if result != 0:
+if result.returncode != 0:
     print(f"[ERR] ({__file__}) Signing failed for {path.name}")
     print(f"[ERR] ({__file__}) STDOUT:\n" + result.stdout.strip())
     print(f"[ERR] ({__file__}) STDERR:\n" + result.stderr.strip())
-    sys.exit(result)  # Propagate the failure
+    sys.exit(result.returncode)  # Propagate the failure
 else:
     print(f"[OK] ({__file__}) Successfully signed {path.name}")
     sys.exit(0)  # Explicit success
