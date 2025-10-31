@@ -22,11 +22,11 @@ Rem ****************************************************************************
 Rem Branding options
 
 @REM corresponds to APPLICATION_SHORTNAME from NEXTCLOUD.cmake
-if "%APP_NAME%" == ""                       set APP_NAME=IONOSHiDriveNext
+if "%APP_NAME%" == ""                       set APP_NAME=STRATOHiDriveNext
 @REM corresponds to APPLICATION_EXECUTABLE from NEXTCLOUD.cmake
-if "%APP_NAME_EXE%" == ""             set APP_NAME_EXE=IONOS_HiDrive_Next
+if "%APP_NAME_EXE%" == ""             set APP_NAME_EXE=STRATO_HiDrive_Next
 @REM corresponds to APPLICATION_NAME from NEXTCLOUD.cmake
-if "%APP_FULL_NAME%" == ""             set APP_FULL_NAME=IONOS HiDrive Next
+if "%APP_FULL_NAME%" == ""             set APP_FULL_NAME=STRATO HiDrive Next
 
 if "%USE_BRANDING%" == ""                   set USE_BRANDING=1
 
