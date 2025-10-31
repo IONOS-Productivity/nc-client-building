@@ -20,7 +20,7 @@ def sanitize_advertise(wxs_path: Path, shortcut_id: str, in_place: bool):
     shortcut.set('Advertise', 'no')
     print(f"[OK] Set Advertise=\"no\" on <Shortcut Id=\"{shortcut_id}\">")
     
-    shortcut.set('Target', '[INSTALLDIR]IONOS_HiDrive_Next.exe')
+    shortcut.set('Target', '[INSTALLDIR]STRATO_HiDrive_Next.exe')
     print(f"[OK] Set Advertise=\"no\" on <Shortcut Id=\"{shortcut_id}\">")
 
     if in_place:

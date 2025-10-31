@@ -225,8 +225,8 @@ parser.add_argument(
     help="Path to the windows signtool.exe", required=False
 )
 parser.add_argument(
-    "--app-name", default="IONOS HiDrive Next",
-    help="Name of app (default: IONOS HiDrive Next)", required=False
+    "--app-name", default="STRATO HiDrive Next",
+    help="Name of app (default: STRATO HiDrive Next)", required=False
 )
 parser.add_argument(
     "--wix-path", 
