@@ -112,6 +112,80 @@ def run_command(command, description, verbose=False):
             print(result.stdout.strip())
 
 
+def preserve_msi_languages(src_msi, dst_msi):
+    """
+    Copy language transform sub-storages and SIS Template from the original MSI
+    into the resigned MSI so that Windows Installer can find the correct language
+    transform on non-English systems (prevents error 1624).
+    Requires: pip install pywin32
+    """
+    try:
+        import pythoncom
+        import win32com.storagecon as sc
+    except ImportError:
+        print("❌ pywin32 is required for multilingual MSI support: pip install pywin32")
+        sys.exit(1)
+
+    # --- Copy Summary Information Stream Template (language ID list) ---
+    try:
+        import msilib  # built-in on Python < 3.13
+        src_db = msilib.OpenDatabase(str(src_msi), msilib.MSIDBOPEN_READONLY)
+        template = src_db.GetSummaryInformation(0).GetProperty(7)  # PID_TEMPLATE = 7
+        del src_db
+
+        dst_db = msilib.OpenDatabase(str(dst_msi), msilib.MSIDBOPEN_TRANSACT)
+        dst_si = dst_db.GetSummaryInformation(1)
+        dst_si.SetProperty(7, template)
+        dst_si.Persist()
+        dst_db.Commit()
+        del dst_db
+    except ImportError:
+        # Python 3.13+ fallback via PowerShell COM
+        ps = (
+            f'$i=New-Object -ComObject WindowsInstaller.Installer;'
+            f'$t=$i.OpenDatabase("{src_msi}",0).SummaryInformation(0).Property(7);'
+            f'$d=$i.OpenDatabase("{dst_msi}",1);'
+            f'$si=$d.SummaryInformation(1);'
+            f'$si.Property(7)=$t;$si.Persist();$d.Commit()'
+        )
+        r = subprocess.run(["powershell", "-Command", ps], capture_output=True, text=True)
+        if r.returncode != 0:
+            print(f"⚠️ Could not copy SIS Template: {r.stderr.strip()}")
+        template = "(set via PowerShell)"
+
+    print(f"✅ Copied SIS Template: {template}")
+
+    # --- Copy language transform sub-storages (OLE compound document sub-storages) ---
+    src_stg = pythoncom.StgOpenStorage(
+        str(src_msi), None, sc.STGM_READ | sc.STGM_SHARE_DENY_WRITE
+    )
+    dst_stg = pythoncom.StgOpenStorage(
+        str(dst_msi), None,
+        sc.STGM_READWRITE | sc.STGM_SHARE_EXCLUSIVE | sc.STGM_TRANSACTED
+    )
+
+    copied = []
+    for stat in src_stg.EnumElements():
+        name = stat[0]
+        try:
+            src_sub = src_stg.OpenStorage(name, None, sc.STGM_READ | sc.STGM_SHARE_EXCLUSIVE)
+        except Exception:
+            continue  # It's a stream, not a sub-storage — skip
+        dst_sub = dst_stg.CreateStorage(
+            name,
+            sc.STGM_CREATE | sc.STGM_WRITE | sc.STGM_SHARE_EXCLUSIVE,
+            0, 0
+        )
+        src_sub.CopyTo(None, None, dst_sub)
+        copied.append(name)
+
+    if copied:
+        dst_stg.Commit(0)
+        print(f"✅ Copied {len(copied)} language transform(s): {', '.join(copied)}")
+    else:
+        print("⚠️  No language transforms found in original MSI")
+
+
 def sign_file(file_path, sign_tool, cert_file, cert_password, app_name):
     sign_result = subprocess.run([
         "python", "sign-file.py",
@@ -333,8 +407,13 @@ run_command([
     str(light), str(wixobj_file),
     "-ext", "WixUtilExtension",
     "-ext", "WixUIExtension",
+    "-sval",
     "-o", str(msi_file)
 ], "Linking WIXOBJ to MSI", args.v)
+
+# Preserve language transforms from the original MSI
+print(f"🔧 Preserving language transforms from original MSI...")
+preserve_msi_languages(start_msi, msi_file)
 
 # Signing the new .msi file
 print(f"🔧 Start signing new .msi file...")
