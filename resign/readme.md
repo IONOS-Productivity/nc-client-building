@@ -10,6 +10,7 @@ The resigning workflow is based on the client-building process used by the CS it
 * Decompiles the MSI using WiX `dark.exe`
 * Finds and signs embedded binaries (.dll/.exe)
 * Recompiles the installer using WiX `candle.exe` and `light.exe`
+* **Preserves multilingual MSI support** by copying language transform sub-storages and the SIS Template from the original MSI into the resigned one (prevents Windows Installer error 1624 on non-English systems)
 * Signs the final MSI using `signtool.exe`
 * Verbose mode for debugging and inspection
 
@@ -21,6 +22,11 @@ The resigning workflow is based on the client-building process used by the CS it
 * **WiX Toolset** installed and accessible via `--wix-path` or `WIX` environment variable
 * **signtool.exe** from the Windows SDK
 * A valid **code signing certificate (.pfx)**
+* **pywin32** for multilingual MSI support (language transform preservation):
+  ```
+  pip install pywin32
+  ```
+  > On Python < 3.13, `msilib` (built-in) is used for the Summary Information Stream. On Python 3.13+, the script falls back to a PowerShell COM call automatically.
 
 Additionally, this script calls two helper scripts:
 
@@ -99,7 +105,9 @@ The script looks for the following files inside the MSI to re-sign:
 * Ensure `sign-file.py` and `fix-wxs.py` are in the same directory or accessible via PATH.
 * The script handles temporary file renaming needed for signing binaries embedded under different names.
 * All output files (including the new MSI) will be placed in the specified `--base-dir`.
-* No cleanup is performed
+* No cleanup is performed.
+* Language transforms are copied from the **original MSI** after relinking, before final signing. Without this step, Windows Installer cannot find the correct language transform on non-English systems and raises error 1624.
+* WiX `light.exe` is invoked with `-sval` (suppress validation) to avoid false validation failures when relinking a decompiled MSI.
 ---
 
 ## ✅ Example Output
