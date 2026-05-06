@@ -378,6 +378,7 @@ fix_result = subprocess.run([
     "python", "fix-wxs.py",
     wxs_file,
     "--extracted-path", str(extracted_dir),
+    "--app-name", app_name,
 ], capture_output=True, text=True)
 
 if fix_result.returncode == 0:

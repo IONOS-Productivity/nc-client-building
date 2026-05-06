@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element
 from pathlib import Path
 
-def sanitize_advertise(wxs_path: Path, shortcut_id: str, in_place: bool):
+def sanitize_advertise(wxs_path: Path, shortcut_id: str, in_place: bool, app_name: str = "IONOS HiDrive Next"):
     ET.register_namespace('', "http://schemas.microsoft.com/wix/2006/wi")  # suppress ns0 in output
     tree = ET.parse(wxs_path)
     root = tree.getroot()
@@ -19,9 +19,10 @@ def sanitize_advertise(wxs_path: Path, shortcut_id: str, in_place: bool):
 
     shortcut.set('Advertise', 'no')
     print(f"[OK] Set Advertise=\"no\" on <Shortcut Id=\"{shortcut_id}\">")
-    
-    shortcut.set('Target', '[INSTALLDIR]IONOS_HiDrive_Next.exe')
-    print(f"[OK] Set Advertise=\"no\" on <Shortcut Id=\"{shortcut_id}\">")
+
+    exe_name = app_name.replace(" ", "_") + ".exe"
+    shortcut.set('Target', f'[INSTALLDIR]{exe_name}')
+    print(f"[OK] Set Target=\"[INSTALLDIR]{exe_name}\" on <Shortcut Id=\"{shortcut_id}\">")
 
     if in_place:
         tree.write(wxs_path, encoding='utf-8', xml_declaration=True)
@@ -136,10 +137,10 @@ def repair_ui(wxs_path: Path, extracted_path: Path, in_place: bool):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Set Advertise=\"no\" on a specific <Shortcut> in a .wxs file.")
     parser.add_argument("wxs_path", type=Path, help="Path to the .wxs file")
-    # parser.add_argument("shortcut_id", help="Id of the <Shortcut> to fix")
     parser.add_argument("--extracted-path", required=True, help="Path to the extracted binary files")
+    parser.add_argument("--app-name", default="IONOS HiDrive Next", help="App name used to derive the shortcut target exe (default: IONOS HiDrive Next)")
 
     args = parser.parse_args()
-    sanitize_advertise(args.wxs_path, "Desktop", True)
-    sanitize_advertise(args.wxs_path, "StartMenu", True)
-    repair_ui(args.wxs_path, args.extracted_path , True)
+    sanitize_advertise(args.wxs_path, "Desktop", True, args.app_name)
+    sanitize_advertise(args.wxs_path, "StartMenu", True, args.app_name)
+    repair_ui(args.wxs_path, args.extracted_path, True)

@@ -1,6 +1,9 @@
 # HiDrive MSI Resigner
 
-This Python script re-signs a given `.msi` installer for **IONOS HiDrive Next** by extracting its contents using the **WiX Toolset**, individually signing key binaries (EXEs and DLLs), and reassembling the installer. It is used to sign the msi delivered by the Nextcloud Customization Service (CS) with a valid IONOS certificate.
+This Python script re-signs a given `.msi` installer for **IONOS HiDrive Next** or **STRATO HiDrive Next** by extracting its contents using the **WiX Toolset**, individually signing key binaries (EXEs and DLLs), and reassembling the installer. It is used to sign the MSI delivered by the Nextcloud Customization Service (CS) with a valid certificate.
+
+The branding (IONOS vs. STRATO) is controlled entirely by the `--app-name` argument — no separate branch or script copy is needed.
+
 The resigning workflow is based on the client-building process used by the CS itself (https://github.com/nextcloud/client-building).
 
 ---
@@ -10,6 +13,7 @@ The resigning workflow is based on the client-building process used by the CS it
 * Decompiles the MSI using WiX `dark.exe`
 * Finds and signs embedded binaries (.dll/.exe)
 * Recompiles the installer using WiX `candle.exe` and `light.exe`
+* **Supports IONOS and STRATO branding** — binary names and shortcut targets are derived dynamically from `--app-name`
 * **Preserves multilingual MSI support** by copying language transform sub-storages and the SIS Template from the original MSI into the resigned one (prevents Windows Installer error 1624 on non-English systems)
 * Signs the final MSI using `signtool.exe`
 * Verbose mode for debugging and inspection
@@ -37,13 +41,25 @@ Additionally, this script calls two helper scripts:
 
 ## 📦 Usage
 
-#### Minimal Example Usage
+### Minimal Example Usage
+
+#### IONOS (default)
+
+```bash
+python resign-msi.py "path/to/installer.msi" \
+  --cert-file "path/to/cert.pfx" \
+  --cert-password "yourPassword" \
+  --base-dir "path/to/temp"
+```
+
+#### STRATO
 
 ```bash
 python resign-msi.py "path/to/installer.msi" \
   --cert-file "path/to/cert.pfx" \
   --cert-password "yourPassword" \
   --base-dir "path/to/temp" \
+  --app-name "STRATO HiDrive Next"
 ```
 
 #### Full Example Usage
@@ -70,7 +86,7 @@ python resign-msi.py "path/to/installer.msi" \
 | `--cert-password` | Password for the certificate                        |
 | `--base-dir`      | Temporary working directory (default: current dir)  |
 | `--sign-tool`     | Path to `signtool.exe` (optional if in PATH)        |
-| `--app-name`      | App name used to identify and sign relevant files   |
+| `--app-name`      | App name controlling branding: `"IONOS HiDrive Next"` (default) or `"STRATO HiDrive Next"`. Determines signed binary names and shortcut targets. |
 | `--wix-path`      | Path to the WiX Toolset (or set `WIX` env variable) |
 | `--v`             | Enable verbose output                               |
 
@@ -84,12 +100,12 @@ The script looks for the following files inside the MSI to re-sign:
 
 * `NCContextMenu.dll`
 * `NCOverlays.dll`
-* `IONOS_HiDrive_Next.exe`
-* `IONOS_HiDrive_Nextcmd.exe`
-* `IONOS_HiDrive_Nextsync.dll`
-* `IONOS_HiDrive_Next_csync.dll`
+* `<AppName>.exe` — e.g. `IONOS_HiDrive_Next.exe` / `STRATO_HiDrive_Next.exe`
+* `<AppName>cmd.exe`
+* `<AppName>sync.dll`
+* `<AppName>_csync.dll`
 
-*(Dynamically derived from the app name)*
+The `<AppName>` prefix is derived from `--app-name` with spaces replaced by underscores. Passing `"STRATO HiDrive Next"` automatically resolves to `STRATO_HiDrive_Next.*`.
 
 ### Wildcard matches:
 
@@ -138,10 +154,10 @@ These dialogs are pulled in at compile time from WixUIExtension.dll and are not 
 
 ### 1. **Fixes broken shortcuts**
 
-Sets `Advertise="no"` on `<Shortcut>` elements with `Id="Desktop"` and `Id="StartMenu"`.
+Sets `Advertise="no"` on `<Shortcut>` elements with `Id="Desktop"` and `Id="StartMenu"`, and sets the `Target` attribute to `[INSTALLDIR]<AppName>.exe` derived from `--app-name`.
 
-* 🛠 Why: The compiliation with light fails otherwise.
-* ✅ Result: Shortcuts are now always created correctly regardless of context.
+* 🛠 Why: The compilation with light fails otherwise, and the shortcut target must match the actual exe name for the selected branding.
+* ✅ Result: Shortcuts are now always created correctly regardless of context, for both IONOS and STRATO branding.
 
 ---
 
